@@ -15,6 +15,13 @@
         <activity android:name=".TagsActivity" android:exported="false" />
         <activity android:name=".FoldersActivity" android:exported="false" />
         <activity android:name=".EditorActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".v3.V3MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".ShareCaptureActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -29,11 +36,5 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/notepad_widget_info" />
         </receiver>
-        <activity android:name=".MainActivity" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 </manifest>
