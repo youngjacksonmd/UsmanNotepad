@@ -61,6 +61,11 @@ class V3RepositoryAdapter(context: Context) {
         return repo.getOrCreateDaily(day).id
     }
 
+    fun convertScratch(id: Long) {
+        repo.find(id)?.let { n -> n.scratch = false; if (n.title.isBlank()) n.title = "Quick thought"; repo.save(n, true) }
+    }
+
+    fun discardScratch(id: Long) = repo.trash(id)
     fun togglePin(id: Long) = repo.togglePin(id)
     fun toggleFavorite(id: Long) = repo.toggleFavorite(id)
     fun archive(id: Long) = repo.archive(id)
@@ -81,7 +86,6 @@ class V3RepositoryAdapter(context: Context) {
     fun notesInFolder(folderId: Long): List<V3NoteRow> = repo.list("", "all").filter { it.folderId == folderId }.map(::row)
     fun tags(): List<String> = repo.allTags()
     fun templates(): List<String> = repo.templates()
-
     fun legacyEditorIntent(context: Context, id: Long): Intent = Intent(context, EditorActivity::class.java).putExtra("note_id", id)
 
     private fun row(n: Note): V3NoteRow {
