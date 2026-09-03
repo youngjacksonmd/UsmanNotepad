@@ -23,16 +23,13 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Extract and inspect uploaded Android project
+      - name: Extract uploaded Android project
         shell: bash
         run: |
           set -euo pipefail
           rm -rf project-src
           mkdir -p project-src
           unzip -q UsmanNotepad_Project.zip -d project-src
-
-          echo '===== Repository project files ====='
-          find project-src -maxdepth 8 -type f -print | sort
 
           SETTINGS_FILE="$(find project-src -type f \( -name 'settings.gradle' -o -name 'settings.gradle.kts' \) | head -n 1)"
           if [ -z "$SETTINGS_FILE" ]; then
@@ -43,16 +40,42 @@ jobs:
           echo "PROJECT_ROOT=$PROJECT_ROOT" >> "$GITHUB_ENV"
           echo "Detected project root: $PROJECT_ROOT"
 
-          echo '===== Important Android files ====='
-          while IFS= read -r file; do
-            echo "----- $file -----"
-            sed -n '1,260p' "$file"
-          done < <(find "$PROJECT_ROOT" -type f \( \
-            -name 'settings.gradle' -o -name 'settings.gradle.kts' -o \
-            -name 'build.gradle' -o -name 'build.gradle.kts' -o \
-            -name 'gradle.properties' -o -name 'AndroidManifest.xml' -o \
-            -name '*.java' -o -name '*.kt' \
-          \) | sort)
+      - name: Patch project to stable Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["PROJECT_ROOT"])
+          root_gradle = root / "build.gradle.kts"
+          app_gradle = root / "app" / "build.gradle.kts"
+
+          root_text = root_gradle.read_text(encoding="utf-8")
+          if 'version "9.4.0"' not in root_text:
+              raise SystemExit("Expected AGP 9.4.0 declaration was not found")
+          root_text = root_text.replace('version "9.4.0"', 'version "8.9.2"', 1)
+          root_gradle.write_text(root_text, encoding="utf-8")
+
+          app_text = app_gradle.read_text(encoding="utf-8")
+          if "compileSdk = 37" not in app_text or "targetSdk = 37" not in app_text:
+              raise SystemExit("Expected compileSdk/targetSdk 37 declarations were not found")
+          app_text = app_text.replace("compileSdk = 37", "compileSdk = 35", 1)
+          app_text = app_text.replace("targetSdk = 37", "targetSdk = 35", 1)
+          if "buildToolsVersion" not in app_text:
+              app_text = app_text.replace(
+                  "compileSdk = 35",
+                  'compileSdk = 35\n    buildToolsVersion = "35.0.0"',
+                  1,
+              )
+          app_gradle.write_text(app_text, encoding="utf-8")
+
+          print("===== Patched root build.gradle.kts =====")
+          print(root_gradle.read_text(encoding="utf-8"))
+          print("===== Patched app/build.gradle.kts =====")
+          print(app_gradle.read_text(encoding="utf-8"))
+          PY
 
       - name: Install stable Android SDK packages
         shell: bash
