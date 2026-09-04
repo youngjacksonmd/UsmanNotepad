@@ -147,7 +147,7 @@ class SettingsScreen extends ConsumerWidget {
                         height: 52,
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          borderRadius: BorderRadius.circular(AppRadius.input),
                         ),
                         child: Icon(
                           Icons.edit_note_rounded,
