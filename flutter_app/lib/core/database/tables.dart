@@ -29,7 +29,7 @@ class Notes extends Table {
   TextColumn get syncStatus => text().withDefault(const Constant('local'))();
   IntColumn get revisionNumber => integer().withDefault(const Constant(0))();
 
-  // Native-v1 compatibility columns. They remain until explicit later migrations.
+  // Native-v1 compatibility columns. They remain until an explicit migration.
   TextColumn get themeKey => text().withDefault(const Constant('system'))();
   IntColumn get unlockAt => integer().withDefault(const Constant(0))();
   IntColumn get expiresAt => integer().withDefault(const Constant(0))();
@@ -43,12 +43,8 @@ class Notes extends Table {
 class ChecklistItems extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get syncId => text().nullable()();
-  IntColumn get noteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-  TextColumn get text => text().withDefault(const Constant(''))();
+  IntColumn get noteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  TextColumn get itemText => text().named('text').withDefault(const Constant(''))();
   BoolColumn get isChecked => boolean().withDefault(const Constant(false))();
   IntColumn get sortOrder => integer()();
   IntColumn get createdAt => integer()();
@@ -57,11 +53,7 @@ class ChecklistItems extends Table {
 
 @DataClassName('EditorDraftRow')
 class EditorDrafts extends Table {
-  IntColumn get noteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get noteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   TextColumn get body => text()();
   TextColumn get mode => text()();
@@ -98,16 +90,8 @@ class Tags extends Table {
 }
 
 class NoteTags extends Table {
-  IntColumn get noteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-  IntColumn get tagId => integer().references(
-    Tags,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get noteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get tagId => integer().references(Tags, #id, onDelete: KeyAction.cascade)();
 
   @override
   Set<Column<Object>> get primaryKey => <Column<Object>>{noteId, tagId};
@@ -116,11 +100,7 @@ class NoteTags extends Table {
 @DataClassName('AttachmentRow')
 class Attachments extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get noteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get noteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
   TextColumn get type => text()();
   TextColumn get localPath => text()();
   TextColumn get displayName => text().nullable()();
@@ -135,16 +115,8 @@ class Attachments extends Table {
 class Tasks extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get syncId => text().nullable()();
-  IntColumn get noteId => integer().nullable().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
-  IntColumn get checklistItemId => integer().nullable().references(
-    ChecklistItems,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
+  IntColumn get noteId => integer().nullable().references(Notes, #id, onDelete: KeyAction.setNull)();
+  IntColumn get checklistItemId => integer().nullable().references(ChecklistItems, #id, onDelete: KeyAction.setNull)();
   TextColumn get title => text()();
   IntColumn get dueAt => integer().nullable()();
   IntColumn get priority => integer().withDefault(const Constant(0))();
@@ -158,16 +130,8 @@ class Tasks extends Table {
 @DataClassName('ReminderRow')
 class Reminders extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get noteId => integer().nullable().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-  IntColumn get taskId => integer().nullable().references(
-    Tasks,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get noteId => integer().nullable().references(Notes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get taskId => integer().nullable().references(Tasks, #id, onDelete: KeyAction.cascade)();
   IntColumn get triggerAt => integer().withDefault(const Constant(0))();
   TextColumn get repeatRule => text().nullable()();
   IntColumn get snoozedUntil => integer().nullable()();
@@ -180,34 +144,18 @@ class Reminders extends Table {
 }
 
 class NoteLinks extends Table {
-  IntColumn get sourceNoteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-  IntColumn get targetNoteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get sourceNoteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get targetNoteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
   TextColumn get linkText => text()();
 
   @override
-  Set<Column<Object>> get primaryKey => <Column<Object>>{
-    sourceNoteId,
-    targetNoteId,
-    linkText,
-  };
+  Set<Column<Object>> get primaryKey => <Column<Object>>{sourceNoteId, targetNoteId, linkText};
 }
 
 @DataClassName('NoteVersionRow')
 class NoteVersions extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get noteId => integer().references(
-    Notes,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
+  IntColumn get noteId => integer().references(Notes, #id, onDelete: KeyAction.cascade)();
   IntColumn get revisionNumber => integer()();
   TextColumn get title => text()();
   TextColumn get body => text()();
@@ -260,8 +208,5 @@ class SyncMetadata extends Table {
   IntColumn get lastLocalRevision => integer().withDefault(const Constant(0))();
 
   @override
-  Set<Column<Object>> get primaryKey => <Column<Object>>{
-    entityType,
-    entitySyncId,
-  };
+  Set<Column<Object>> get primaryKey => <Column<Object>>{entityType, entitySyncId};
 }
