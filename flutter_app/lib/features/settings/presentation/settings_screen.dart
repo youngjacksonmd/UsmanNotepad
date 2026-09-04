@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:usman_notepad/app/providers.dart';
 import 'package:usman_notepad/core/theme/tokens.dart';
-import 'package:usman_notepad/core/widgets/sukoon_mark.dart';
 import 'package:usman_notepad/features/settings/domain/app_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -17,46 +16,71 @@ class SettingsScreen extends ConsumerWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 760),
           child: ListView(
-            padding: const EdgeInsetsDirectional.fromSTEB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.hero),
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.hero,
+            ),
             children: <Widget>[
               Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
               const SizedBox(height: AppSpacing.xxl),
               _section(context, 'Appearance'),
               const SizedBox(height: AppSpacing.sm),
               Card(
-                child: Column(
-                  children: <Widget>[
-                    _themeTile(ref, settings, AppThemePreference.system, 'System', Icons.brightness_auto_rounded),
-                    _themeTile(ref, settings, AppThemePreference.light, 'Light', Icons.light_mode_outlined),
-                    _themeTile(ref, settings, AppThemePreference.dark, 'Dark', Icons.dark_mode_outlined),
-                  ],
+                child: RadioGroup<AppThemePreference>(
+                  groupValue: settings.theme,
+                  onChanged: (next) {
+                    if (next != null) {
+                      ref.read(appSettingsProvider.notifier).setTheme(next);
+                    }
+                  },
+                  child: Column(
+                    children: const <Widget>[
+                      RadioListTile<AppThemePreference>(
+                        value: AppThemePreference.system,
+                        title: Text('System'),
+                        secondary: Icon(Icons.brightness_auto_rounded),
+                      ),
+                      RadioListTile<AppThemePreference>(
+                        value: AppThemePreference.light,
+                        title: Text('Light'),
+                        secondary: Icon(Icons.light_mode_outlined),
+                      ),
+                      RadioListTile<AppThemePreference>(
+                        value: AppThemePreference.dark,
+                        title: Text('Dark'),
+                        secondary: Icon(Icons.dark_mode_outlined),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),
               _section(context, 'Notes'),
               const SizedBox(height: AppSpacing.sm),
               Card(
-                child: Column(
-                  children: <Widget>[
-                    RadioListTile<NoteViewMode>(
-                      value: NoteViewMode.grid,
-                      groupValue: settings.noteView,
-                      onChanged: (value) {
-                        if (value != null) ref.read(appSettingsProvider.notifier).setNoteView(value);
-                      },
-                      title: const Text('Grid'),
-                      secondary: const Icon(Icons.grid_view_rounded),
-                    ),
-                    RadioListTile<NoteViewMode>(
-                      value: NoteViewMode.list,
-                      groupValue: settings.noteView,
-                      onChanged: (value) {
-                        if (value != null) ref.read(appSettingsProvider.notifier).setNoteView(value);
-                      },
-                      title: const Text('List'),
-                      secondary: const Icon(Icons.view_agenda_outlined),
-                    ),
-                  ],
+                child: RadioGroup<NoteViewMode>(
+                  groupValue: settings.noteView,
+                  onChanged: (next) {
+                    if (next != null) {
+                      ref.read(appSettingsProvider.notifier).setNoteView(next);
+                    }
+                  },
+                  child: const Column(
+                    children: <Widget>[
+                      RadioListTile<NoteViewMode>(
+                        value: NoteViewMode.grid,
+                        title: Text('Grid'),
+                        secondary: Icon(Icons.grid_view_rounded),
+                      ),
+                      RadioListTile<NoteViewMode>(
+                        value: NoteViewMode.list,
+                        title: Text('List'),
+                        secondary: Icon(Icons.view_agenda_outlined),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),
@@ -83,9 +107,15 @@ class SettingsScreen extends ConsumerWidget {
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Icon(Icons.shield_outlined, color: Theme.of(context).colorScheme.primary),
+                          Icon(
+                            Icons.shield_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           const SizedBox(width: AppSpacing.sm),
-                          Text('Local-first', style: Theme.of(context).textTheme.titleMedium),
+                          Text(
+                            'Local-first',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.sm),
@@ -96,7 +126,9 @@ class SettingsScreen extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         'Phase 1 does not yet provide database-at-rest encryption. The app does not claim that local notes are cryptographically protected.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                       ),
                     ],
                   ),
@@ -110,17 +142,33 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
                     children: <Widget>[
-                      const SukoonMark(size: 52),
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                        ),
+                        child: Icon(
+                          Icons.edit_note_rounded,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text('Sukoon Notes', style: Theme.of(context).textTheme.titleLarge),
+                            Text(
+                              'UsmanNotepad',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               'Created by Usman',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
                             ),
                           ],
                         ),
@@ -137,18 +185,11 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _section(BuildContext context, String label) {
-    return Text(label, style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant));
-  }
-
-  Widget _themeTile(WidgetRef ref, AppSettings settings, AppThemePreference value, String label, IconData icon) {
-    return RadioListTile<AppThemePreference>(
-      value: value,
-      groupValue: settings.theme,
-      onChanged: (next) {
-        if (next != null) ref.read(appSettingsProvider.notifier).setTheme(next);
-      },
-      title: Text(label),
-      secondary: Icon(icon),
+    return Text(
+      label,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
     );
   }
 }

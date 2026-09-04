@@ -14,15 +14,13 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[
-          databaseProvider.overrideWithValue(database),
-        ],
+        overrides: [databaseProvider.overrideWithValue(database)],
         child: const UsmanNotepadApp(),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Sukoon Notes'), findsOneWidget);
+    expect(find.textContaining('Usman'), findsWidgets);
     expect(find.text('Search your notes'), findsOneWidget);
     expect(find.text('Take a note…'), findsOneWidget);
     expect(find.text('Text'), findsWidgets);

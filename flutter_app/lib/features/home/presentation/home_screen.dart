@@ -9,7 +9,6 @@ import 'package:usman_notepad/core/widgets/empty_state.dart';
 import 'package:usman_notepad/core/widgets/premium_note_card.dart';
 import 'package:usman_notepad/core/widgets/quick_capture_bar.dart';
 import 'package:usman_notepad/core/widgets/soft_search_bar.dart';
-import 'package:usman_notepad/core/widgets/sukoon_mark.dart';
 import 'package:usman_notepad/features/notes/domain/note.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -28,7 +27,7 @@ class HomeScreen extends ConsumerWidget {
               child: CalmEmptyState(
                 icon: Icons.cloud_off_rounded,
                 title: 'Your notes are still local',
-                message: 'Sukoon Notes could not open the local note list. Reopen the app to retry.',
+                message: 'UsmanNotepad could not open the local note list. Reopen the app to retry.',
               ),
             ),
             data: (items) {
@@ -42,17 +41,17 @@ class HomeScreen extends ConsumerWidget {
                   AppSpacing.hero,
                 ),
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      const SukoonMark(size: 42),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text('Sukoon Notes', style: Theme.of(context).textTheme.titleLarge),
-                    ],
+                  Text(
+                    _greeting(),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(_greeting(), style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Your thoughts, beautifully organized.', style: Theme.of(context).textTheme.headlineLarge),
+                  Text(
+                    'Your thoughts, beautifully organized.',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   SoftSearchBar(onTap: () => context.go('/search')),
                   const SizedBox(height: AppSpacing.md),
@@ -89,20 +88,27 @@ class HomeScreen extends ConsumerWidget {
 
   Future<void> _create(BuildContext context, WidgetRef ref, NoteType type) async {
     final id = await ref.read(noteRepositoryProvider).create(type: type);
-    if (context.mounted) context.push('/editor/$id?new=1');
+    if (context.mounted) {
+      context.push('/editor/$id?new=1');
+    }
   }
 
   String _greeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return 'Good morning, Usman';
+    if (hour < 18) return 'Good afternoon, Usman';
+    return 'Good evening, Usman';
   }
 
   Widget _quietHint(BuildContext context, String text) {
     return Padding(
       padding: const EdgeInsetsDirectional.symmetric(vertical: AppSpacing.sm),
-      child: Text(text, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+      ),
     );
   }
 }
@@ -119,7 +125,12 @@ class _SectionTitle extends StatelessWidget {
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(width: AppSpacing.xs),
         if (count > 0)
-          Text('$count', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          Text(
+            '$count',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
       ],
     );
   }
@@ -133,8 +144,13 @@ class _CardWrap extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 900 ? 3 : constraints.maxWidth >= 560 ? 2 : 1;
-        final width = (constraints.maxWidth - (columns - 1) * AppSpacing.sm) / columns;
+        final columns = constraints.maxWidth >= 900
+            ? 3
+            : constraints.maxWidth >= 560
+                ? 2
+                : 1;
+        final width =
+            (constraints.maxWidth - (columns - 1) * AppSpacing.sm) / columns;
         return Wrap(
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.sm,
@@ -142,7 +158,10 @@ class _CardWrap extends ConsumerWidget {
             for (final note in notes)
               SizedBox(
                 width: width,
-                child: PremiumNoteCard(note: note, onTap: () => context.push('/editor/${note.id}')),
+                child: PremiumNoteCard(
+                  note: note,
+                  onTap: () => context.push('/editor/${note.id}'),
+                ),
               ),
           ],
         );
