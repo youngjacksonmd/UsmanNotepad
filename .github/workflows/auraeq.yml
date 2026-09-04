@@ -1,0 +1,64 @@
+name: AuraEQ APK Build
+
+on:
+  push:
+    branches:
+      - feat/auraeq-build
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="${ANDROID_SDK_ROOT:-$ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Lint and build AuraEQ
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :auraeq:lintDebug :auraeq:assembleDebug --stacktrace
+
+      - name: Collect APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$(find auraeq/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
+          test -n "$APK"
+          cp "$APK" AuraEQ-v1.0.0-debug.apk
+          test -s AuraEQ-v1.0.0-debug.apk
+          unzip -t AuraEQ-v1.0.0-debug.apk >/dev/null
+          sha256sum AuraEQ-v1.0.0-debug.apk > AuraEQ-v1.0.0-debug.apk.sha256
+          ls -lh AuraEQ-v1.0.0-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuraEQ-APK
+          path: |
+            AuraEQ-v1.0.0-debug.apk
+            AuraEQ-v1.0.0-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
