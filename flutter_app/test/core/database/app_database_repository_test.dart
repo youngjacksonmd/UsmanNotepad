@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:usman_notepad/core/database/app_database.dart';
 import 'package:usman_notepad/features/notes/data/drift_note_repository.dart';
 import 'package:usman_notepad/features/notes/domain/note.dart';
@@ -100,11 +101,36 @@ void main() {
     expect(results.map((result) => result.noteId), contains(noteId));
   });
 
+  test('draft snapshot persists independently of canonical note', () async {
+    final id = await notes.create(type: NoteType.text);
+    final savedAt = DateTime.fromMillisecondsSinceEpoch(123456);
+    await notes.saveDraft(
+      NoteDraft(
+        noteId: id,
+        title: 'Safety copy',
+        body: 'Newest unsaved words',
+        type: NoteType.text,
+        checklistJson: '[]',
+        baseRevision: 3,
+        savedAt: savedAt,
+      ),
+    );
+
+    final draft = await notes.loadDraft(id);
+    expect(draft, isNotNull);
+    expect(draft!.body, 'Newest unsaved words');
+    expect(draft.baseRevision, 3);
+    expect(draft.savedAt, savedAt);
+
+    await notes.clearDraft(id);
+    expect(await notes.loadDraft(id), isNull);
+  });
+
   test('native v1 database upgrades in place without changing note text', () async {
     final directory = await Directory.systemTemp.createTemp('usman_notepad_v1_');
     final file = File('${directory.path}/usman_notepad_v2.db');
-    final legacy = NativeDatabase(file);
-    await legacy.runCustom('''
+    final legacy = sqlite3.sqlite3.open(file.path);
+    legacy.execute('''
       CREATE TABLE notes (
         id INTEGER PRIMARY KEY,
         title TEXT NOT NULL DEFAULT '',
@@ -128,15 +154,25 @@ void main() {
         is_daily INTEGER NOT NULL DEFAULT 0
       )
     ''');
-    await legacy.runCustom('''
+    legacy.execute(
+      '''
       INSERT INTO notes(
         id,title,body,mode,created_at,updated_at,is_pinned,is_favorite
-      ) VALUES(
-        42,'Legacy note','Client ki payment ابھی pending ہے.','text',100,200,1,1
-      )
-    ''');
-    await legacy.runCustom('PRAGMA user_version = 1');
-    await legacy.close();
+      ) VALUES(?,?,?,?,?,?,?,?)
+      ''',
+      <Object?>[
+        42,
+        'Legacy note',
+        'Client ki payment ابھی pending ہے.',
+        'text',
+        100,
+        200,
+        1,
+        1,
+      ],
+    );
+    legacy.execute('PRAGMA user_version = 1');
+    legacy.dispose();
 
     final migrated = AppDatabase.forTesting(NativeDatabase(file));
     final repository = DriftNoteRepository(migrated);

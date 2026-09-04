@@ -6,6 +6,9 @@ abstract interface class NoteRepository {
   Future<List<Note>> list({NoteListFilter filter = NoteListFilter.active});
   Stream<List<Note>> watch({NoteListFilter filter = NoteListFilter.active});
   Future<void> save(NoteEdit edit);
+  Future<NoteDraft?> loadDraft(int noteId);
+  Future<void> saveDraft(NoteDraft draft);
+  Future<void> clearDraft(int noteId);
   Future<void> setPinned(int id, bool value);
   Future<void> setFavorite(int id, bool value);
   Future<void> softDelete(int id);

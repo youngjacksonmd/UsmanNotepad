@@ -92,6 +92,45 @@ final class DriftNoteRepository implements NoteRepository {
   }
 
   @override
+  Future<NoteDraft?> loadDraft(int noteId) async {
+    final query = _db.select(_db.editorDrafts)
+      ..where((row) => row.noteId.equals(noteId));
+    final row = await query.getSingleOrNull();
+    if (row == null) return null;
+    return NoteDraft(
+      noteId: row.noteId,
+      title: row.title,
+      body: row.body,
+      type: NoteTypeStorage.parse(row.mode),
+      checklistJson: row.checklistJson,
+      baseRevision: row.baseRevision,
+      savedAt: DateTime.fromMillisecondsSinceEpoch(row.savedAt),
+    );
+  }
+
+  @override
+  Future<void> saveDraft(NoteDraft draft) async {
+    await _db.into(_db.editorDrafts).insertOnConflictUpdate(
+          EditorDraftsCompanion.insert(
+            noteId: draft.noteId,
+            title: draft.title,
+            body: draft.body,
+            mode: draft.type.value,
+            checklistJson: Value(draft.checklistJson),
+            baseRevision: draft.baseRevision,
+            savedAt: draft.savedAt.millisecondsSinceEpoch,
+          ),
+        );
+  }
+
+  @override
+  Future<void> clearDraft(int noteId) async {
+    await (_db.delete(_db.editorDrafts)
+          ..where((row) => row.noteId.equals(noteId)))
+        .go();
+  }
+
+  @override
   Future<void> setPinned(int id, bool value) async {
     await (_db.update(_db.notes)..where((row) => row.id.equals(id))).write(
       NotesCompanion(

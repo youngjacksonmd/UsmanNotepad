@@ -52,6 +52,26 @@ class NoteEdit {
   final NoteType type;
 }
 
+class NoteDraft {
+  const NoteDraft({
+    required this.noteId,
+    required this.title,
+    required this.body,
+    required this.type,
+    required this.checklistJson,
+    required this.baseRevision,
+    required this.savedAt,
+  });
+
+  final int noteId;
+  final String title;
+  final String body;
+  final NoteType type;
+  final String checklistJson;
+  final int baseRevision;
+  final DateTime savedAt;
+}
+
 class ChecklistEntry {
   const ChecklistEntry({
     required this.id,
