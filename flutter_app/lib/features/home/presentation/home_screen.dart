@@ -28,7 +28,7 @@ class HomeScreen extends ConsumerWidget {
               child: CalmEmptyState(
                 icon: Icons.cloud_off_rounded,
                 title: 'Your notes are still local',
-                message: 'Sukoon Notes could not open the local note list. Reopen the app to retry.',
+                message: 'UsmanNotepad could not open the local note list. Reopen the app to retry.',
               ),
             ),
             data: (items) {
@@ -44,10 +44,10 @@ class HomeScreen extends ConsumerWidget {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      const SukoonMark(size: 42),
+                      const UsmanNotepadMark(size: 42),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        'Sukoon Notes',
+                        'UsmanNotepad',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ],
