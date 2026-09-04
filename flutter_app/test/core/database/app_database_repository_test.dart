@@ -172,7 +172,7 @@ void main() {
       ],
     );
     legacy.execute('PRAGMA user_version = 1');
-    legacy.dispose();
+    legacy.close();
 
     final migrated = AppDatabase.forTesting(NativeDatabase(file));
     final repository = DriftNoteRepository(migrated);

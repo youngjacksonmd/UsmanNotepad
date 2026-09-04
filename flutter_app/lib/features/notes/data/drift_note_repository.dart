@@ -111,14 +111,14 @@ final class DriftNoteRepository implements NoteRepository {
   @override
   Future<void> saveDraft(NoteDraft draft) async {
     await _db.into(_db.editorDrafts).insertOnConflictUpdate(
-          EditorDraftsCompanion.insert(
-            noteId: draft.noteId,
-            title: draft.title,
-            body: draft.body,
-            mode: draft.type.value,
+          EditorDraftsCompanion(
+            noteId: Value(draft.noteId),
+            title: Value(draft.title),
+            body: Value(draft.body),
+            mode: Value(draft.type.value),
             checklistJson: Value(draft.checklistJson),
-            baseRevision: draft.baseRevision,
-            savedAt: draft.savedAt.millisecondsSinceEpoch,
+            baseRevision: Value(draft.baseRevision),
+            savedAt: Value(draft.savedAt.millisecondsSinceEpoch),
           ),
         );
   }
