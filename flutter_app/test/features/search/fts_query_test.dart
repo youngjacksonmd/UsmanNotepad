@@ -7,14 +7,23 @@ void main() {
   });
 
   test('words become quoted prefix terms', () {
-    expect(FtsQuery.fromUserInput('client invoice'), '"client"* AND "invoice"*');
+    expect(
+      FtsQuery.fromUserInput('client invoice'),
+      '"client"* AND "invoice"*',
+    );
   });
 
   test('quotes and punctuation cannot break MATCH syntax', () {
-    expect(FtsQuery.fromUserInput('say "hello" + paid'), '"say"* AND "hello"* AND "paid"*');
+    expect(
+      FtsQuery.fromUserInput('say "hello" + paid'),
+      '"say"* AND "hello"* AND "paid"*',
+    );
   });
 
   test('Unicode words remain searchable', () {
-    expect(FtsQuery.fromUserInput('payment ابھی pending'), '"payment"* AND "ابھی"* AND "pending"*');
+    expect(
+      FtsQuery.fromUserInput('payment ابھی pending'),
+      '"payment"* AND "ابھی"* AND "pending"*',
+    );
   });
 }
