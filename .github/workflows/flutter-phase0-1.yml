@@ -1,0 +1,51 @@
+name: Flutter Phase 0-1
+
+on:
+  push:
+    branches: [phase0-1-flutter-core]
+  pull_request:
+    paths:
+      - 'flutter_app/**'
+      - '.github/workflows/flutter-phase0-1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: flutter_app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.2'
+          channel: stable
+          cache: true
+      - name: Generate Android platform wrapper
+        run: |
+          flutter create --platforms=android --org com.usman --project-name usman_notepad .
+          sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g' android/app/build.gradle.kts
+          find android/app/src/main/kotlin -name '*.kt' -print0 | xargs -0 sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g'
+      - name: Resolve packages
+        run: flutter pub get
+      - name: Generate Drift code
+        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Format check
+        run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - name: Analyze
+        run: flutter analyze
+      - name: Unit and widget tests
+        run: flutter test
+      - name: Build debug APK
+        run: flutter build apk --debug
+      - name: Build release APK
+        run: flutter build apk --release
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UsmanNotepad-Flutter-Phase0-1
+          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
