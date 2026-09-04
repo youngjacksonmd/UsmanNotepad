@@ -18,7 +18,16 @@ void main() {
         child: const UsmanNotepadApp(),
       ),
     );
-    await tester.pumpAndSettle();
+
+    // Async settings + Drift initialization can require several frames. Keep
+    // this bounded so a persistent animation can never stall the CI build.
+    for (var frame = 0; frame < 40; frame++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.text('UsmanNotepad').evaluate().isNotEmpty &&
+          find.text('Take a note…').evaluate().isNotEmpty) {
+        break;
+      }
+    }
 
     expect(find.text('UsmanNotepad'), findsOneWidget);
     expect(find.text('Search your notes'), findsOneWidget);
