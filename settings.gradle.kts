@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "UsmanNotepad"
 include(":app")
+include(":auraeq")
