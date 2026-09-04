@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:usman_notepad/app/providers.dart';
 import 'package:usman_notepad/core/theme/tokens.dart';
+import 'package:usman_notepad/core/widgets/sukoon_mark.dart';
 import 'package:usman_notepad/features/settings/domain/app_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -142,25 +143,14 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
                     children: <Widget>[
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(AppRadius.input),
-                        ),
-                        child: Icon(
-                          Icons.edit_note_rounded,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
-                      ),
+                      const SukoonMark(size: 52),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'UsmanNotepad',
+                              'Sukoon Notes',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: AppSpacing.xs),
