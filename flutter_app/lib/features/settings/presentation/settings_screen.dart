@@ -143,14 +143,14 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
                     children: <Widget>[
-                      const SukoonMark(size: 52),
+                      const UsmanNotepadMark(size: 52),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'Sukoon Notes',
+                              'UsmanNotepad',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: AppSpacing.xs),
