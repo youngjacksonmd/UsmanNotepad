@@ -1,11 +1,24 @@
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:usman_notepad/app/app.dart';
+import 'package:usman_notepad/app/providers.dart';
+import 'package:usman_notepad/core/database/app_database.dart';
 
 void main() {
   testWidgets('home exposes the Phase 1 writing-first surface', (tester) async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final database = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(database.close);
+
     await tester.pumpWidget(
-      const ProviderScope(child: UsmanNotepadApp()),
+      ProviderScope(
+        overrides: <Override>[
+          databaseProvider.overrideWithValue(database),
+        ],
+        child: const UsmanNotepadApp(),
+      ),
     );
     await tester.pumpAndSettle();
 
