@@ -2,7 +2,7 @@ name: Flutter Phase 0-1
 
 on:
   push:
-    branches: [phase0-1-flutter-core]
+    branches: [phase0-1-flutter-core, sukoon-notes-release]
   pull_request:
     paths:
       - 'flutter_app/**'
@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.android/debug.keystore
-          key: usman-notepad-debug-signing-v1
+          key: sukoon-notes-debug-signing-v1
       - name: Generate Android platform wrapper
         run: |
           flutter create --platforms=android --org com.usman --project-name usman_notepad .
