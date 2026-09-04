@@ -30,7 +30,7 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  AppDatabase.forTesting(QueryExecutor executor) : super(executor);
+  AppDatabase.forTesting(super.executor);
 
   @override
   int get schemaVersion => 2;
@@ -104,7 +104,9 @@ class AppDatabase extends _$AppDatabase {
       await _addColumnIfMissing('tags', 'updated_at', 'INTEGER NOT NULL DEFAULT 0');
     }
 
-    if (!await _tableExists('note_tags')) await migrator.createTable(noteTags);
+    if (!await _tableExists('note_tags')) {
+      await migrator.createTable(noteTags);
+    }
 
     if (!await _tableExists('attachments')) {
       await migrator.createTable(attachments);
@@ -126,7 +128,9 @@ class AppDatabase extends _$AppDatabase {
       await _addColumnIfMissing('reminders', 'updated_at', 'INTEGER NOT NULL DEFAULT 0');
     }
 
-    if (!await _tableExists('note_links')) await migrator.createTable(noteLinks);
+    if (!await _tableExists('note_links')) {
+      await migrator.createTable(noteLinks);
+    }
 
     if (!await _tableExists('templates')) {
       await migrator.createTable(templates);
@@ -138,13 +142,27 @@ class AppDatabase extends _$AppDatabase {
       await _addColumnIfMissing('templates', 'updated_at', 'INTEGER NOT NULL DEFAULT 0');
     }
 
-    if (!await _tableExists('checklist_items')) await migrator.createTable(checklistItems);
-    if (!await _tableExists('editor_drafts')) await migrator.createTable(editorDrafts);
-    if (!await _tableExists('tasks')) await migrator.createTable(tasks);
-    if (!await _tableExists('note_versions')) await migrator.createTable(noteVersions);
-    if (!await _tableExists('settings')) await migrator.createTable(settings);
-    if (!await _tableExists('sync_queue')) await migrator.createTable(syncQueue);
-    if (!await _tableExists('sync_metadata')) await migrator.createTable(syncMetadata);
+    if (!await _tableExists('checklist_items')) {
+      await migrator.createTable(checklistItems);
+    }
+    if (!await _tableExists('editor_drafts')) {
+      await migrator.createTable(editorDrafts);
+    }
+    if (!await _tableExists('tasks')) {
+      await migrator.createTable(tasks);
+    }
+    if (!await _tableExists('note_versions')) {
+      await migrator.createTable(noteVersions);
+    }
+    if (!await _tableExists('settings')) {
+      await migrator.createTable(settings);
+    }
+    if (!await _tableExists('sync_queue')) {
+      await migrator.createTable(syncQueue);
+    }
+    if (!await _tableExists('sync_metadata')) {
+      await migrator.createTable(syncMetadata);
+    }
   }
 
   Future<bool> _tableExists(String table) async {

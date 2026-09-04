@@ -33,7 +33,7 @@ void main() {
 
     await notes.setPinned(id, true);
     await notes.setFavorite(id, true);
-    var note = await notes.find(id);
+    final note = await notes.find(id);
     expect(note, isNotNull);
     expect(note!.title, 'Claim follow-up');
     expect(note.body, 'Client ki payment ابھی pending ہے.');

@@ -5,17 +5,17 @@ import 'package:usman_notepad/features/notes/domain/note_repository.dart';
 import 'package:uuid/uuid.dart';
 
 final class DriftNoteRepository implements NoteRepository {
-  DriftNoteRepository(this._db, {Uuid uuid = const Uuid()}) : _uuid = uuid;
+  DriftNoteRepository(this._db, {this.uuid = const Uuid()});
 
   final AppDatabase _db;
-  final Uuid _uuid;
+  final Uuid uuid;
 
   @override
   Future<int> create({required NoteType type}) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     return _db.into(_db.notes).insert(
           NotesCompanion.insert(
-            syncId: Value(_uuid.v4()),
+            syncId: Value(uuid.v4()),
             mode: Value(type.value),
             createdAt: now,
             updatedAt: now,
@@ -78,12 +78,13 @@ final class DriftNoteRepository implements NoteRepository {
         mode: Value(edit.type.value),
         updatedAt: Value(now),
         wordCount: Value(words),
-        characterCount: Value(body.characters.length),
+        characterCount: Value(body.runes.length),
         readingTimeSeconds: Value(words == 0 ? 0 : ((words / 200) * 60).ceil()),
-        revisionNumber: const Value.absent(),
       ),
     );
-    if (updated == 0) throw StateError('Note ${edit.id} was not found.');
+    if (updated == 0) {
+      throw StateError('Note ${edit.id} was not found.');
+    }
     await _db.customStatement(
       'UPDATE notes SET revision_number = revision_number + 1 WHERE id = ?',
       <Object?>[edit.id],
@@ -160,7 +161,7 @@ final class DriftNoteRepository implements NoteRepository {
       final now = DateTime.now().millisecondsSinceEpoch;
       final id = await _db.into(_db.checklistItems).insert(
             ChecklistItemsCompanion.insert(
-              syncId: Value(_uuid.v4()),
+              syncId: Value(uuid.v4()),
               noteId: noteId,
               itemText: Value(text),
               sortOrder: current + 1,
@@ -205,7 +206,9 @@ final class DriftNoteRepository implements NoteRepository {
   Future<void> deleteChecklistItem(int itemId) async {
     await _db.transaction(() async {
       final row = await (_db.select(_db.checklistItems)..where((item) => item.id.equals(itemId))).getSingleOrNull();
-      if (row == null) return;
+      if (row == null) {
+        return;
+      }
       await (_db.delete(_db.checklistItems)..where((item) => item.id.equals(itemId))).go();
       await _mirrorChecklistBody(row.noteId);
     });
@@ -231,15 +234,15 @@ final class DriftNoteRepository implements NoteRepository {
         _db.notes.id.equalsExp(_db.checklistItems.noteId),
         useColumns: false,
       ),
-    ])
-      ..where(
-        _db.checklistItems.isChecked.equals(false) &
-            _db.notes.isDeleted.equals(false) &
-            _db.notes.isArchived.equals(false),
-      )
-      ..orderBy(<OrderingTerm Function()>[
-        () => OrderingTerm.desc(_db.checklistItems.updatedAt),
-      ]);
+    ]);
+    query.where(
+      _db.checklistItems.isChecked.equals(false) &
+          _db.notes.isDeleted.equals(false) &
+          _db.notes.isArchived.equals(false),
+    );
+    query.orderBy(<OrderingTerm>[
+      OrderingTerm(expression: _db.checklistItems.updatedAt, mode: OrderingMode.desc),
+    ]);
     final rows = await query.get();
     return rows.map((row) => _mapChecklist(row.readTable(_db.checklistItems))).toList(growable: false);
   }
