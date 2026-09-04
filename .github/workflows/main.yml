@@ -36,6 +36,34 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
+      - name: Lint and build AuraEQ
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon :auraeq:lintDebug :auraeq:assembleDebug --stacktrace
+
+      - name: Collect AuraEQ APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          AURAEQ_APK="$(find auraeq/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
+          test -n "$AURAEQ_APK"
+          cp "$AURAEQ_APK" AuraEQ-v1.0.0-debug.apk
+          test -s AuraEQ-v1.0.0-debug.apk
+          unzip -t AuraEQ-v1.0.0-debug.apk >/dev/null
+          sha256sum AuraEQ-v1.0.0-debug.apk > AuraEQ-v1.0.0-debug.apk.sha256
+          ls -lh AuraEQ-v1.0.0-debug.apk
+
+      - name: Upload AuraEQ APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuraEQ-APK
+          path: |
+            AuraEQ-v1.0.0-debug.apk
+            AuraEQ-v1.0.0-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Test UsmanNotepad
         shell: bash
         run: |
@@ -48,26 +76,14 @@ jobs:
           set -euo pipefail
           gradle --no-daemon :app:assembleDebug --stacktrace
 
-      - name: Lint and build AuraEQ
-        shell: bash
-        run: |
-          set -euo pipefail
-          gradle --no-daemon :auraeq:lintDebug :auraeq:assembleDebug --stacktrace
-
-      - name: Collect APKs
+      - name: Collect UsmanNotepad APK
         shell: bash
         run: |
           set -euo pipefail
           NOTEPAD_APK="$(find app/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
-          AURAEQ_APK="$(find auraeq/build/outputs/apk/debug -type f -name '*.apk' | head -n 1)"
           test -n "$NOTEPAD_APK"
-          test -n "$AURAEQ_APK"
           cp "$NOTEPAD_APK" UsmanNotepad-V3.00.apk
-          cp "$AURAEQ_APK" AuraEQ-v1.0.0-debug.apk
-          test -s AuraEQ-v1.0.0-debug.apk
-          unzip -t AuraEQ-v1.0.0-debug.apk >/dev/null
-          sha256sum AuraEQ-v1.0.0-debug.apk > AuraEQ-v1.0.0-debug.apk.sha256
-          ls -lh UsmanNotepad-V3.00.apk AuraEQ-v1.0.0-debug.apk
+          test -s UsmanNotepad-V3.00.apk
 
       - name: Upload UsmanNotepad APK
         uses: actions/upload-artifact@v4
@@ -75,13 +91,3 @@ jobs:
           name: UsmanNotepad-APK
           path: UsmanNotepad-V3.00.apk
           if-no-files-found: error
-
-      - name: Upload AuraEQ APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AuraEQ-APK
-          path: |
-            AuraEQ-v1.0.0-debug.apk
-            AuraEQ-v1.0.0-debug.apk.sha256
-          if-no-files-found: error
-          retention-days: 30
