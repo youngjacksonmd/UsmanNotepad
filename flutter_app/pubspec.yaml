@@ -1,7 +1,7 @@
 name: usman_notepad
-description: Privacy-first offline-first notes application.
+description: Sukoon Notes — a privacy-first, offline-first writing application created by Usman.
 publish_to: none
-version: 4.0.0+4
+version: 4.0.1+5
 
 environment:
   sdk: ">=3.12.0 <4.0.0"
