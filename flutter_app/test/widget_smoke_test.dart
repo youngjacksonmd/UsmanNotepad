@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,9 +42,13 @@ void main() {
     expect(find.text('Tasks'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
 
-    // Do not manually close the in-memory Drift executor here. Flutter's test
-    // isolate owns this ephemeral database and tears it down with the isolate.
-    // Closing it while Riverpod stream subscriptions are unwinding can keep
-    // flutter_tester alive even after all assertions have completed.
+    // Dispose the ProviderScope while the fake clock is still under our
+    // control. Drift schedules a zero-duration timer when its watched query is
+    // closed; one additional timed pump drains that cleanup deterministically.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(milliseconds: 1));
+
+    // The in-memory executor is intentionally owned by the widget-test isolate.
+    // Manually closing it here can race Riverpod's asynchronous stream teardown.
   });
 }
