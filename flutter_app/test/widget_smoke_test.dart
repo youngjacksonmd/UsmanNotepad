@@ -20,7 +20,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Usman'), findsWidgets);
+    expect(find.text('Sukoon Notes'), findsOneWidget);
     expect(find.text('Search your notes'), findsOneWidget);
     expect(find.text('Take a note…'), findsOneWidget);
     expect(find.text('Text'), findsWidgets);
