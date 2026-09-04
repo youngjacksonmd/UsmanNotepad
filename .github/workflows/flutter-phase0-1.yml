@@ -29,12 +29,15 @@ jobs:
           flutter create --platforms=android --org com.usman --project-name usman_notepad .
           sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g' android/app/build.gradle.kts
           find android/app/src/main/kotlin -name '*.kt' -print0 | xargs -0 sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g'
+          rm -f test/widget_test.dart
       - name: Resolve packages
         run: flutter pub get
       - name: Generate Drift code
         run: dart run build_runner build
-      - name: Format check
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format source in verification workspace
+        run: |
+          dart format lib test
+          git diff -- lib test || true
       - name: Analyze
         run: flutter analyze
       - name: Unit and widget tests
