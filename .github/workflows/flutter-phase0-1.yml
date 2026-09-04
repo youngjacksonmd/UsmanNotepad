@@ -24,11 +24,17 @@ jobs:
           flutter-version: '3.47.2'
           channel: stable
           cache: true
+      - name: Cache Android signing identity
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: sukoon-notes-debug-signing-v1
       - name: Generate Android platform wrapper
         run: |
           flutter create --platforms=android --org com.usman --project-name usman_notepad .
           sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g' android/app/build.gradle.kts
           find android/app/src/main/kotlin -name '*.kt' -print0 | xargs -0 sed -i 's/com\.usman\.usman_notepad/com.usman.notepad/g'
+          bash tool/apply_android_branding.sh
           rm -f test/widget_test.dart
       - name: Resolve packages
         run: flutter pub get
@@ -49,6 +55,6 @@ jobs:
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: UsmanNotepad-Flutter-Phase0-1
+          name: Sukoon-Notes-v4.0.1
           path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
