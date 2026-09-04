@@ -9,6 +9,7 @@ import 'package:usman_notepad/core/widgets/empty_state.dart';
 import 'package:usman_notepad/core/widgets/premium_note_card.dart';
 import 'package:usman_notepad/core/widgets/quick_capture_bar.dart';
 import 'package:usman_notepad/core/widgets/soft_search_bar.dart';
+import 'package:usman_notepad/core/widgets/sukoon_mark.dart';
 import 'package:usman_notepad/features/notes/domain/note.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -27,7 +28,7 @@ class HomeScreen extends ConsumerWidget {
               child: CalmEmptyState(
                 icon: Icons.cloud_off_rounded,
                 title: 'Your notes are still local',
-                message: 'UsmanNotepad could not open the local note list. Reopen the app to retry.',
+                message: 'Sukoon Notes could not open the local note list. Reopen the app to retry.',
               ),
             ),
             data: (items) {
@@ -41,6 +42,14 @@ class HomeScreen extends ConsumerWidget {
                   AppSpacing.hero,
                 ),
                 children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      const SukoonMark(size: 42),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text('Sukoon Notes', style: Theme.of(context).textTheme.titleLarge),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   Text(_greeting(), style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
                   const SizedBox(height: AppSpacing.xs),
                   Text('Your thoughts, beautifully organized.', style: Theme.of(context).textTheme.headlineLarge),
@@ -85,9 +94,9 @@ class HomeScreen extends ConsumerWidget {
 
   String _greeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning, Usman';
-    if (hour < 18) return 'Good afternoon, Usman';
-    return 'Good evening, Usman';
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   }
 
   Widget _quietHint(BuildContext context, String text) {
