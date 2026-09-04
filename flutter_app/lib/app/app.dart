@@ -13,7 +13,7 @@ class UsmanNotepadApp extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider).value ?? const AppSettings();
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'UsmanNotepad',
+      title: 'Sukoon Notes',
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       routerConfig: appRouter,
       theme: AppTheme.light(),
