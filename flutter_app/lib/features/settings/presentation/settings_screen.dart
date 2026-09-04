@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:usman_notepad/app/providers.dart';
 import 'package:usman_notepad/core/theme/tokens.dart';
+import 'package:usman_notepad/core/widgets/sukoon_mark.dart';
 import 'package:usman_notepad/features/settings/domain/app_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -96,6 +97,33 @@ class SettingsScreen extends ConsumerWidget {
                       Text(
                         'Phase 1 does not yet provide database-at-rest encryption. The app does not claim that local notes are cryptographically protected.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+              _section(context, 'About'),
+              const SizedBox(height: AppSpacing.sm),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Row(
+                    children: <Widget>[
+                      const SukoonMark(size: 52),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text('Sukoon Notes', style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              'Created by Usman',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.primary),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
